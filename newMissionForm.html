@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nouvelle Mission - Coord</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f7f7f7;
+    }
+
+    #form-container {
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .logo img {
+      height: 50px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    p {
+      text-align: center;
+      color: #555;
+    }
+
+    label {
+      display: block;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+
+    /* 🔥 CHAMPS AMÉLIORÉS */
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      border: 1px solid #ddd;
+      border-radius: 12px; /* coins arrondis */
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04); /* ombre légère */
+      transition: all 0.2s ease;
+      outline: none;
+    }
+
+    input:focus, textarea:focus {
+      border-color: #000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    button {
+      margin-top: 25px;
+      padding: 12px 20px;
+      cursor: pointer;
+      border-radius: 12px;
+      border: none;
+      background: black;
+      color: white;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      opacity: 0.85;
+    }
+
+    .tag {
+      margin: 5px;
+      padding: 10px 15px;
+      border: 1px solid #ddd;
+      background: white;
+      color: black;
+      cursor: pointer;
+      border-radius: 20px;
+      display: inline-block;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+      transition: 0.2s;
+    }
+
+    .tag.active {
+      background: black;
+      color: white;
+    }
+
+    .tag:hover {
+      transform: translateY(-1px);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .success {
+      text-align: center;
+      margin-top: 80px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="form-container">
+
+  <div class="logo">
+    <img src="logo.png" alt="Coord">
+  </div>
+
+  <h1>Nouvelle Mission</h1>
+
+  <p>
+    Votre aventure commence ici ! Décrivez simplement votre besoin et on vous trouve la cible expérimentée adaptée à votre profil.
+  </p>
+
+  <form id="missionForm">
+
+    <label>Qui es-tu ? *</label>
+    <input type="text" name="user_name" required />
+
+    <label>Nom du projet *</label>
+    <input type="text" name="project_name" required />
+
+    <label>Ton secteur *</label>
+
+    <div id="sectorTags">
+      <button type="button" class="tag">Agroalimentaire</button>
+      <button type="button" class="tag">Éducation / formation</button>
+      <button type="button" class="tag">Technologie / numérique</button>
+      <button type="button" class="tag">Environnement / green business</button>
+      <button type="button" class="tag">Commerce</button>
+      <button type="button" class="tag">Services</button>
+      <button type="button" class="tag">Santé / bien-être</button>
+      <button type="button" class="tag">Industrie / production</button>
+      <button type="button" class="tag">Culture / création</button>
+      <button type="button" class="tag">Autre</button>
+    </div>
+
+    <input type="hidden" name="sector" id="sectorInput" />
+    <input type="text" id="sectorCustom" class="hidden" placeholder="Précise ton secteur..." />
+
+    <label>Titre de ta mission *</label>
+    <input type="text" name="mission_title" required />
+
+    <label>Description du besoin *</label>
+    <textarea name="mission_description" rows="6" required></textarea>
+
+    <button type="submit">Envoyer ma mission</button>
+
+  </form>
+
+</div>
+
+<div id="success" class="hidden success">
+  <h1>Ta mission est bien validée !</h1>
+
+  <p>
+    Nous recherchons un.e entrepreneur.e prêt.e à t'aider et on revient vers toi au plus vite !
+  </p>
+
+  <img 
+    src="success.png" 
+    alt="Mission envoyée avec succès"
+    style="margin-top: 25px; max-width: 300px; width: 100%; height: auto;"
+  />
+</div>
+
+<script>
+  const tags = document.querySelectorAll(".tag");
+  const sectorInput = document.getElementById("sectorInput");
+  const sectorCustom = document.getElementById("sectorCustom");
+
+  let selected = "";
+
+  tags.forEach(tag => {
+    tag.addEventListener("click", () => {
+      const value = tag.innerText;
+
+      tags.forEach(t => t.classList.remove("active"));
+      tag.classList.add("active");
+
+      if (value === "Autre") {
+        sectorCustom.classList.remove("hidden");
+        selected = "";
+      } else {
+        sectorCustom.classList.add("hidden");
+        sectorCustom.value = "";
+        selected = value;
+      }
+
+      sectorInput.value = selected;
+    });
+  });
+
+  const form = document.getElementById("missionForm");
+  const formContainer = document.getElementById("form-container");
+  const success = document.getElementById("success");
+
+  form.addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const finalSector = sectorCustom.classList.contains("hidden")
+      ? sectorInput.value
+      : "Autre : " + sectorCustom.value;
+
+    const data = {
+      user_name: form.user_name.value,
+      project_name: form.project_name.value,
+      sector: finalSector,
+      mission_title: form.mission_title.value,
+      mission_description: form.mission_description.value
+    };
+
+    console.log("Mission :", data);
+
+    formContainer.classList.add("hidden");
+    success.classList.remove("hidden");
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Clôture de mission - Coord</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f7f7f7;
+    }
+
+    #form-container {
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .logo img {
+      height: 50px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    p {
+      text-align: center;
+      color: #555;
+    }
+
+    label {
+      display: block;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      outline: none;
+    }
+
+    input:focus, textarea:focus {
+      border-color: #000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    button {
+      margin-top: 25px;
+      padding: 12px 20px;
+      cursor: pointer;
+      border-radius: 12px;
+      border: none;
+      background: black;
+      color: white;
+      width: 100%;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      opacity: 0.85;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .success {
+      text-align: center;
+      margin-top: 80px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="form-container">
+
+  <div class="logo">
+    <img src="logo.png" alt="Coord">
+  </div>
+
+  <h1>Clôture de mission</h1>
+
+  <p>
+    Ta mission est terminée. Merci pour ta participation ! Ce formulaire te permet de compléter ton compte rendu et d'enrichir ton cercle virtuel.
+  </p>
+
+  <form id="missionCloseForm">
+
+    <!-- Champ 1 -->
+    <label>Qui es-tu ? (*)</label>
+    <input type="text" name="user_name" required />
+
+    <!-- Champ 2 -->
+    <label>Mission concernée (*)</label>
+    <input type="text" name="mission_title" id="missionTitle" required />
+
+    <!-- Champ 3 -->
+    <label>Qu'est-ce qui a été fait lors de cette mission ?</label>
+    <textarea name="mission_summary" rows="6" placeholder="Décris les actions réalisées, échanges, résultats..."></textarea>
+
+    <!-- Champ 4 -->
+    <label>Points clés (*)</label>
+    <textarea name="key_takeaways" rows="4" required placeholder="Note 2 ou 3 points clés que tu retiens"></textarea>
+
+    <button type="submit">Valider</button>
+
+  </form>
+
+</div>
+
+<div id="success" class="hidden success">
+  <h1>Merci !</h1>
+  <p>
+    Ton retour a bien été enregistré et ton cercle virtuel a été enrichi.
+  </p>
+
+  <img 
+    src="logo.png" 
+    alt="Coord"
+    style="margin-top: 40px; height: 40px; opacity: 0.8;"
+  />
+</div>
+
+<script>
+  // PRE-REMPLISSAGE VIA MAKE (URL)
+  const params = new URLSearchParams(window.location.search);
+  const mission = params.get("mission_title");
+
+  if (mission) {
+    document.getElementById("missionTitle").value = mission;
+  }
+
+  // SUBMIT
+  const form = document.getElementById("missionCloseForm");
+  const formContainer = document.getElementById("form-container");
+  const success = document.getElementById("success");
+
+  form.addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const data = {
+      user_name: form.user_name.value,
+      mission_title: form.mission_title.value,
+      mission_summary: form.mission_summary.value,
+      key_takeaways: form.key_takeaways.value
+    };
+
+    console.log("Clôture mission :", data);
+
+    formContainer.classList.add("hidden");
+    success.classList.remove("hidden");
+  });
+</script>
+
+</body>
+</html>
