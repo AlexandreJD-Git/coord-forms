@@ -182,25 +182,20 @@
   const sectorInput = document.getElementById("sectorInput");
   const sectorCustom = document.getElementById("sectorCustom");
 
-  let selected = "";
-
   tags.forEach(tag => {
     tag.addEventListener("click", () => {
       const value = tag.innerText;
-
       tags.forEach(t => t.classList.remove("active"));
       tag.classList.add("active");
 
       if (value === "Autre") {
         sectorCustom.classList.remove("hidden");
-        selected = "";
+        sectorInput.value = "";
       } else {
         sectorCustom.classList.add("hidden");
         sectorCustom.value = "";
-        selected = value;
+        sectorInput.value = value;
       }
-
-      sectorInput.value = selected;
     });
   });
 
@@ -215,18 +210,21 @@
       ? sectorInput.value
       : "Autre : " + sectorCustom.value;
 
-    const data = {
-      user_name: form.user_name.value,
-      project_name: form.project_name.value,
-      sector: finalSector,
-      mission_title: form.mission_title.value,
-      mission_description: form.mission_description.value
-    };
+    sectorInput.value = finalSector;
 
-    console.log("Mission :", data);
+    const data = new FormData(form);
 
-    formContainer.classList.add("hidden");
-    success.classList.remove("hidden");
+    fetch("https://hook.eu1.make.com/fg9jid6tpys4ww1l5mmoypw8h2yvwzlf", {
+      method: "POST",
+      body: new URLSearchParams(data)
+    })
+    .then(() => {
+      formContainer.classList.add("hidden");
+      success.classList.remove("hidden");
+    })
+    .catch(() => {
+      alert("Une erreur est survenue, réessaie.");
+    });
   });
 </script>
 
