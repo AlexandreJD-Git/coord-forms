@@ -46,20 +46,22 @@
       font-weight: bold;
     }
 
-    /* 🔥 CHAMPS AMÉLIORÉS */
-    input, textarea {
+    input,
+    textarea {
       width: 100%;
       padding: 12px;
       margin-top: 8px;
       border: 1px solid #ddd;
-      border-radius: 12px; /* coins arrondis */
+      border-radius: 12px;
       background: #fff;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04); /* ombre légère */
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
       transition: all 0.2s ease;
       outline: none;
+      box-sizing: border-box;
     }
 
-    input:focus, textarea:focus {
+    input:focus,
+    textarea:focus {
       border-color: #000;
       box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     }
@@ -123,27 +125,26 @@
   <h1>Nouvelle Mission</h1>
 
   <p>
-  Chaque projet rencontre des défis. Créez une mission, décrivez votre besoin et trouvez le pair qui vous aidera à franchir la prochaine étape..
+    Chaque projet rencontre des défis. Créez une mission, décrivez votre besoin et trouvez le pair qui vous aidera à franchir la prochaine étape.
   </p>
 
   <form id="missionForm" action="https://hook.eu1.make.com/fg9jid6tpys4ww1l5mmoypw8h2yvwzlf" method="POST">
-    
-  
+
     <label>Nom du projet</label>
     <input type="text" name="project_name" required />
 
     <label>Qui es-tu ?*</label>
     <input type="text" name="user_name" required />
 
-   <label>Stade du projet *</label>
+    <label>Stade du projet *</label>
 
-<div id="projectStageTags">
-  <button type="button" class="tag">Idée</button>
-  <button type="button" class="tag">En cours de création</button>
-  <button type="button" class="tag">Lancé</button>
-</div>
+    <div id="projectStageTags">
+      <button type="button" class="tag">Idée</button>
+      <button type="button" class="tag">En cours de création</button>
+      <button type="button" class="tag">Lancé</button>
+    </div>
 
-<input type="hidden" name="project_stage" id="projectStageInput" />
+    <input type="hidden" name="project_stage" id="projectStageInput" />
 
     <label>Ton secteur *</label>
 
@@ -164,15 +165,28 @@
     <input type="text" id="sectorCustom" class="hidden" placeholder="Précise ton secteur..." />
 
     <label>Titre de ta mission *</label>
-    <input type="text" name="mission_title" placeholder="Ex : Trouver un pair pour challenger mon idée de startup" required />
+    <input
+      type="text"
+      name="mission_title"
+      placeholder="Ex : Trouver un pair pour challenger mon idée de startup"
+      required
+    />
 
     <label>Description du besoin *</label>
     <textarea name="mission_description" rows="6" required></textarea>
 
     <label for="email">Ton adresse mail *</label>
-    <input type="email" id="email" name="email" required placeholder="ex : prenom@mail.com" />
-    <small>Nous utiliserons cette adresse pour te tenir informé de l’avancement de ta mission.</small>
+    <input
+      type="email"
+      id="email"
+      name="email"
+      required
+      placeholder="ex : prenom@mail.com"
+    />
 
+    <small>
+      Nous utiliserons cette adresse pour te tenir informé de l’avancement de ta mission.
+    </small>
 
     <button type="submit">Envoyer ma mission</button>
 
@@ -187,22 +201,43 @@
     Nous recherchons un.e entrepreneur.e prêt.e à t'aider et on revient vers toi au plus vite !
   </p>
 
-  <img 
-    src="success.png" 
+  <img
+    src="success.png"
     alt="Mission envoyée avec succès"
     style="margin-top: 25px; max-width: 300px; width: 100%; height: auto;"
   />
 </div>
 
 <script>
-  const tags = document.querySelectorAll(".tag");
+
+  // =========================
+  // STADE DU PROJET
+  // =========================
+
+  const projectStageTags = document.querySelectorAll("#projectStageTags .tag");
+  const projectStageInput = document.getElementById("projectStageInput");
+
+  projectStageTags.forEach(tag => {
+    tag.addEventListener("click", () => {
+      projectStageTags.forEach(t => t.classList.remove("active"));
+      tag.classList.add("active");
+      projectStageInput.value = tag.innerText;
+    });
+  });
+
+  // =========================
+  // SECTEUR
+  // =========================
+
+  const sectorTags = document.querySelectorAll("#sectorTags .tag");
   const sectorInput = document.getElementById("sectorInput");
   const sectorCustom = document.getElementById("sectorCustom");
 
-  tags.forEach(tag => {
+  sectorTags.forEach(tag => {
     tag.addEventListener("click", () => {
       const value = tag.innerText;
-      tags.forEach(t => t.classList.remove("active"));
+
+      sectorTags.forEach(t => t.classList.remove("active"));
       tag.classList.add("active");
 
       if (value === "Autre") {
@@ -216,12 +251,30 @@
     });
   });
 
+  // =========================
+  // ENVOI FORMULAIRE
+  // =========================
+
   const form = document.getElementById("missionForm");
   const formContainer = document.getElementById("form-container");
   const success = document.getElementById("success");
 
   form.addEventListener("submit", function(e) {
+
     e.preventDefault();
+
+    if (!projectStageInput.value) {
+      alert("Merci de sélectionner un stade du projet.");
+      return;
+    }
+
+    if (
+      !sectorInput.value &&
+      (sectorCustom.classList.contains("hidden") || !sectorCustom.value.trim())
+    ) {
+      alert("Merci de sélectionner un secteur.");
+      return;
+    }
 
     const finalSector = sectorCustom.classList.contains("hidden")
       ? sectorInput.value
@@ -231,7 +284,7 @@
 
     const data = new FormData(form);
 
-    fetch("https://hook.eu1.make.com/fg9jid6tpys4ww1l5mmoypw8h2yvwzlf", {
+    fetch(form.action, {
       method: "POST",
       body: new URLSearchParams(data)
     })
@@ -242,7 +295,9 @@
     .catch(() => {
       alert("Une erreur est survenue, réessaie.");
     });
+
   });
+
 </script>
 
 </body>
