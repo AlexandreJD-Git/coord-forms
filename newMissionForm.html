@@ -117,21 +117,33 @@
 <div id="form-container">
 
   <div class="logo">
-    <img src="logo.png" alt="Coord">
+    <img src="logoforms.png" alt="Coord">
   </div>
 
   <h1>Nouvelle Mission</h1>
 
   <p>
-    Votre aventure commence ici ! Décrivez simplement votre besoin et on vous trouve la cible expérimentée adaptée à votre profil.
+  Chaque projet rencontre des défis. Créez une mission, décrivez votre besoin et trouvez le pair qui vous aidera à franchir la prochaine étape..
   </p>
 
   <form id="missionForm" action="https://hook.eu1.make.com/fg9jid6tpys4ww1l5mmoypw8h2yvwzlf" method="POST">
-    <label>Qui es-tu ? *</label>
+    
+  
+    <label>Nom du projet</label>
+    <input type="text" name="project_name" required />
+
+    <label>Qui es-tu ?*</label>
     <input type="text" name="user_name" required />
 
-    <label>Nom du projet *</label>
-    <input type="text" name="project_name" required />
+   <label>Stade du projet *</label>
+
+<div id="projectStageTags">
+  <button type="button" class="tag">Idée</button>
+  <button type="button" class="tag">En cours de création</button>
+  <button type="button" class="tag">Lancé</button>
+</div>
+
+<input type="hidden" name="project_stage" id="projectStageInput" />
 
     <label>Ton secteur *</label>
 
@@ -152,10 +164,15 @@
     <input type="text" id="sectorCustom" class="hidden" placeholder="Précise ton secteur..." />
 
     <label>Titre de ta mission *</label>
-    <input type="text" name="mission_title" required />
+    <input type="text" name="mission_title" placeholder="Ex : Trouver un pair pour challenger mon idée de startup" required />
 
     <label>Description du besoin *</label>
     <textarea name="mission_description" rows="6" required></textarea>
+
+    <label for="email">Ton adresse mail *</label>
+    <input type="email" id="email" name="email" required placeholder="ex : prenom@mail.com" />
+    <small>Nous utiliserons cette adresse pour te tenir informé de l’avancement de ta mission.</small>
+
 
     <button type="submit">Envoyer ma mission</button>
 
