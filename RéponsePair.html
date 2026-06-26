@@ -61,7 +61,6 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     }
 
-    /* DECISION BUTTONS */
     .decision {
       display: flex;
       gap: 10px;
@@ -110,39 +109,34 @@
 <div id="form-container">
 
   <div class="logo">
-    <img src="logo.png" alt="Coord">
+    <img src="logoforms.png" alt="Coord">
   </div>
 
   <h1>Réponse pair</h1>
 
-  <p>
-    Une mission vous a été proposée. Indiquez simplement si vous souhaitez y participer.
-  </p>
+  <p>Une mission vous a été proposée. Indiquez votre réponse.</p>
 
-  <form id="reponseForm" action="https://hook.eu1.make.com/uh5y120hdulq1k8a1onibn2yud6plyja" method="POST">
+  <!-- ✅ UN SEUL FORMULAIRE -->
+  <form id="reponsePair"
+        action="https://hook.eu1.make.com/uh5y120hdulq1k8a1onibn2yud6plyja"
+        method="POST">
 
-  <form id="pairForm">
-
-    <!-- Champ 1 -->
     <label>Qui es-tu ? (*)</label>
     <input type="text" name="user_name" required />
 
-    <!-- Champ 2 (pré-rempli Make) -->
     <label>Mission concernée (*)</label>
     <input type="text" name="mission_title" id="missionTitle" required />
 
-    <!-- Champ 3 -->
     <label>Ta réponse (*)</label>
     <div class="decision">
-      <button type="button" id="acceptBtn">Accepter</button>
-      <button type="button" id="declineBtn">Décliner</button>
+      <button type="button" id="acceptBtn">Disponible</button>
+      <button type="button" id="declineBtn">Indisponible</button>
     </div>
 
     <input type="hidden" name="pair_decision" id="pairDecision" />
 
-    <!-- Champ 4 -->
-    <label>Propose 3 disponibilités dans les 48h (*)</label>
-    <textarea name="availability_48h" rows="4" placeholder="Ex : Lundi 10-12h, Mardi 14-16h, Mercredi 9-11h" required></textarea>
+    <label>Disponibilités dans les 48h (*)</label>
+    <textarea name="availability_48h" rows="4" required></textarea>
 
     <button type="submit" class="submit">Valider</button>
 
@@ -152,63 +146,65 @@
 
 <div id="success" class="hidden success">
   <h1>Réponse envoyée !</h1>
-
-  <p>
-    Merci, ta réponse a bien été prise en compte.
-  </p>
-
-  <img 
-    src="logo.png" 
-    alt="Coord"
-    style="margin-top: 40px; height: 40px; opacity: 0.8;"
-  />
+  <p>Merci, ta réponse a bien été prise en compte.</p>
+  <img src="logo.png" style="margin-top:40px;height:40px;opacity:0.8;" />
 </div>
 
 <script>
-  // PRE-REMPLISSAGE VIA URL (Make)
+
+  // Pré-remplissage mission
   const params = new URLSearchParams(window.location.search);
   const mission = params.get("mission_title");
   if (mission) {
     document.getElementById("missionTitle").value = mission;
   }
 
-  // DECISION LOGIC
+  // Boutons décision
   const acceptBtn = document.getElementById("acceptBtn");
   const declineBtn = document.getElementById("declineBtn");
   const decisionInput = document.getElementById("pairDecision");
 
   acceptBtn.addEventListener("click", () => {
-    decisionInput.value = "Accepter";
+    decisionInput.value = "Disponible";
     acceptBtn.classList.add("active");
     declineBtn.classList.remove("active");
   });
 
   declineBtn.addEventListener("click", () => {
-    decisionInput.value = "Décliner";
+    decisionInput.value = "Indisponible";
     declineBtn.classList.add("active");
     acceptBtn.classList.remove("active");
   });
 
-  // SUBMIT
-  const form = document.getElementById("pairForm");
+  // SUBMIT + ENVOI MAKE
+  const form = document.getElementById("reponsePair");
   const formContainer = document.getElementById("form-container");
   const success = document.getElementById("success");
 
   form.addEventListener("submit", function(e) {
     e.preventDefault();
 
-    const data = {
-      user_name: form.user_name.value,
-      mission_title: form.mission_title.value,
-      pair_decision: decisionInput.value,
-      availability_48h: form.availability_48h.value
-    };
+    if (!decisionInput.value) {
+      alert("Merci de choisir Disponible ou Indisponible.");
+      return;
+    }
 
-    console.log("Réponse pair :", data);
+    const data = new FormData(form);
 
-    formContainer.classList.add("hidden");
-    success.classList.remove("hidden");
+    fetch(form.action, {
+      method: "POST",
+      body: new URLSearchParams(data)
+    })
+    .then(() => {
+      formContainer.classList.add("hidden");
+      success.classList.remove("hidden");
+    })
+    .catch(() => {
+      alert("Erreur lors de l'envoi.");
+    });
+
   });
+
 </script>
 
 </body>
