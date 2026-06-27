@@ -104,21 +104,26 @@
 
   <form id="missionCloseForm">
 
-    <!-- Champ 1 -->
+    <!-- Champs visibles -->
     <label>Qui es-tu ? (*)</label>
     <input type="text" name="user_name" required />
 
-    <!-- Champ 2 -->
     <label>Mission concernée (*)</label>
     <input type="text" name="mission_title" id="missionTitle" required />
 
-    <!-- Champ 3 -->
     <label>Qu'est-ce qui a été fait lors de cette mission ?</label>
     <textarea name="mission_summary" rows="6" placeholder="Décris les actions réalisées, échanges, résultats..."></textarea>
 
-    <!-- Champ 4 -->
     <label>Points clés (*)</label>
     <textarea name="key_takeaways" rows="4" required placeholder="Note 2 ou 3 points clés que tu retiens"></textarea>
+
+    <!-- Champs cachés -->
+    <input type="hidden" name="mission_id" id="missionId" />
+    <input type="hidden" name="pair_id" id="pairId" />
+    <input type="hidden" name="email_porteur" id="emailPorteur" />
+    <input type="hidden" name="email_pair" id="emailPair" />
+    <input type="hidden" name="nom_pair" id="nomPair" />
+    <input type="hidden" name="titre_mission" id="titreMission" />
 
     <button type="submit">Valider</button>
 
@@ -140,15 +145,22 @@
 </div>
 
 <script>
-  // PRE-REMPLISSAGE VIA MAKE (URL)
+  // PRE-REMPLISSAGE VIA URL (Make)
   const params = new URLSearchParams(window.location.search);
-  const mission = params.get("mission_title");
 
+  document.getElementById("missionId").value = params.get("mission_id") || "";
+  document.getElementById("pairId").value = params.get("pair_id") || "";
+  document.getElementById("emailPorteur").value = params.get("email_porteur") || "";
+  document.getElementById("emailPair").value = params.get("email_pair") || "";
+  document.getElementById("nomPair").value = params.get("nom_pair") || "";
+  document.getElementById("titreMission").value = params.get("titre_mission") || "";
+
+  const mission = params.get("mission_title");
   if (mission) {
     document.getElementById("missionTitle").value = mission;
   }
 
-  // SUBMIT
+  // SUBMIT VERS MAKE
   const form = document.getElementById("missionCloseForm");
   const formContainer = document.getElementById("form-container");
   const success = document.getElementById("success");
@@ -156,17 +168,19 @@
   form.addEventListener("submit", function(e) {
     e.preventDefault();
 
-    const data = {
-      user_name: form.user_name.value,
-      mission_title: form.mission_title.value,
-      mission_summary: form.mission_summary.value,
-      key_takeaways: form.key_takeaways.value
-    };
+    const data = new FormData(form);
 
-    console.log("Clôture mission :", data);
-
-    formContainer.classList.add("hidden");
-    success.classList.remove("hidden");
+    fetch("COLLE_ICI_TON_URL_WEBHOOK_MAKE", {
+      method: "POST",
+      body: new URLSearchParams(data)
+    })
+    .then(() => {
+      formContainer.classList.add("hidden");
+      success.classList.remove("hidden");
+    })
+    .catch(() => {
+      alert("Une erreur est survenue, réessaie.");
+    });
   });
 </script>
 
