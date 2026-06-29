@@ -1,0 +1,142 @@
+/* =========================
+   BASE
+========================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", Arial, sans-serif;
+  color: #551f8b;
+  background: #fff;
+  line-height: 1.55;
+}
+
+/* =========================
+   CONTAINER
+========================= */
+
+.container {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 100px;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.topbar {
+  background: linear-gradient(to bottom, #000349, #8933cd);
+}
+
+.topbar-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  max-width: 100%;
+  width: 100%;
+
+  padding: 28px 48px;
+  min-height: 92px;
+}
+
+.logo {
+  height: 42px;
+  width: auto;
+  display: block;
+}
+
+.badge {
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.35);
+  color: white;
+}
+
+/* =========================
+   HERO
+========================= */
+
+.hero {
+  padding: 110px 0 90px;
+}
+
+.h1-light {
+  font-size: 28px;
+  margin: 0 0 12px 0;
+  color: #551f8b;
+}
+
+.h1-main {
+  font-size: 52px;
+  margin: 0 0 16px 0;
+  line-height: 1.1;
+  color: #551f8b;
+}
+
+.h1-sub {
+  font-size: 22px;
+  margin: 0 0 32px 0;
+  color: #551f8b;
+}
+
+/* =========================
+   SECTION
+========================= */
+
+.section {
+  padding: 110px 0;
+  border-top: 1px solid rgba(0,0,0,0.06);
+}
+
+.section h2 {
+  font-size: 36px;
+  margin: 0 0 24px 0;
+  color: #551f8b;
+}
+
+.section h3 {
+  font-size: 22px;
+  margin: 32px 0 16px 0;
+  color: #551f8b;
+}
+
+.section p {
+  font-size: 17px;
+  margin: 0 0 14px 0;
+  line-height: 1.7;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.btn-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  gap: 12px;
+}
+
+.btn-primary,
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 14px 20px;
+  border-radius: 10px;
+
+  font-size: 16px;
+  font-weight: 500;
+
+  background: #722bb7;
+  color: white;
+  text-decoration: none;
+}
