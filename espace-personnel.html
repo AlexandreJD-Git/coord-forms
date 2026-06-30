@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mon espace - Coord</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f7f7f7;
+    }
+
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      margin-bottom: 25px;
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .logo img {
+      height: 50px;
+    }
+
+    h1 {
+      margin-bottom: 5px;
+    }
+
+    h2 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 10px;
+    }
+
+    .welcome {
+      text-align: center;
+      color: #555;
+      margin-bottom: 30px;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .info-label {
+      font-weight: bold;
+      color: #555;
+    }
+
+    .info-value {
+      color: #111;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 18px;
+      border-radius: 10px;
+      border: none;
+      background: black;
+      color: white;
+      text-decoration: none;
+      font-size: 14px;
+      cursor: pointer;
+      margin-top: 15px;
+      transition: 0.2s;
+    }
+
+    .btn:hover {
+      opacity: 0.85;
+    }
+
+    .btn-secondary {
+      background: white;
+      color: black;
+      border: 1px solid #ddd;
+    }
+
+    .mission-item, .cercle-item, .report-item {
+      padding: 15px;
+      border: 1px solid #eee;
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+
+    .mission-title {
+      font-weight: bold;
+      font-size: 16px;
+      margin-bottom: 5px;
+    }
+
+    .status-tag {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-left: 10px;
+    }
+
+    .status-ouverte { background: #FEF3C7; color: #92400E; }
+    .status-encours { background: #DBEAFE; color: #1E40AF; }
+    .status-cloturee { background: #D1FAE5; color: #065F46; }
+
+    .meta {
+      font-size: 13px;
+      color: #888;
+      margin-top: 5px;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: #999;
+      padding: 30px 0;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 60px 0;
+      color: #888;
+    }
+
+    .points-cles {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #f0f0f0;
+      font-size: 14px;
+      color: #444;
+    }
+
+    .note-badge {
+      display: inline-block;
+      background: #111;
+      color: white;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 13px;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="logo">
+  <img src="logo.png" alt="Coord">
+</div>
+
+<div id="loading" class="loading">Chargement de ton espace...</div>
+
+<div id="content" style="display:none;">
+
+  <!-- PROFIL -->
+  <div class="card">
+    <h1 id="welcomeName">Bonjour</h1>
+    <p class="welcome">Voici ton espace Coord</p>
+
+    <div class="info-row">
+      <span class="info-label">Projet</span>
+      <span class="info-value" id="profilProjet">-</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Secteur</span>
+      <span class="info-value" id="profilSecteur">-</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Statut</span>
+      <span class="info-value" id="profilStatut">-</span>
+    </div>
+
+    <a class="btn btn-secondary" id="btnModifier" href="#">Demander une modification</a>
+  </div>
+
+  <!-- MISSIONS -->
+  <div class="card">
+    <h2>Mes missions</h2>
+    <a class="btn" id="btnNouvelleMission" href="newMissionForm.html">+ Créer une nouvelle mission</a>
+    <div id="missionsList" style="margin-top:20px;"></div>
+  </div>
+
+  <!-- CERCLE VIRTUEL -->
+  <div class="card">
+    <h2>Mon cercle virtuel</h2>
+    <div id="cercleList"></div>
+  </div>
+
+  <!-- COMPTES RENDUS -->
+  <div class="card">
+    <h2>Mes comptes rendus</h2>
+    <div id="reportsList"></div>
+  </div>
+
+</div>
+
+<script>
+  const AIRTABLE_TOKEN = "patb3WnGPTQR0aTzP";
+  const BASE_ID = "appQvCE9Y6OciHw2L";
+
+  const params = new URLSearchParams(window.location.search);
+  const porteurId = params.get("porteur_id");
+
+  if (!porteurId) {
+    document.getElementById("loading").innerText = "Lien invalide. Contacte Coord pour obtenir ton accès.";
+  } else {
+    chargerEspace();
+  }
+
+  async function airtableGet(table, recordId) {
+    const url = `https://api.airtable.com/v0/${BASE_ID}/${encodeURIComponent(table)}/${recordId}`;
+    const res = await fetch(url, {
+      headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` }
+    });
+    return res.json();
+  }
+
+  async function airtableSearch(table, formula) {
+    const url = `https://api.airtable.com/v0/${BASE_ID}/${encodeURIComponent(table)}?filterByFormula=${encodeURIComponent(formula)}`;
+    const res = await fetch(url, {
+      headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` }
+    });
+    const data = await res.json();
+    return data.records || [];
+  }
+
+  function statusClass(statut) {
+    if (statut === "Ouverte") return "status-ouverte";
+    if (statut === "En cours" || statut === "En attente de réponse") return "status-encours";
+    if (statut === "Clôturée") return "status-cloturee";
+    return "";
+  }
+
+  async function chargerEspace() {
+    try {
+      document.getElementById("loading").innerText = "Récupération du profil...";
+
+      const porteur = await airtableGet("Porteurs", porteurId);
+
+      if (porteur.error) {
+        document.getElementById("loading").innerText = "Erreur Airtable : " + JSON.stringify(porteur.error);
+        return;
+      }
+
+      const f = porteur.fields;
+
+      document.getElementById("welcomeName").innerText = "Bonjour " + (f["Nom"] || "");
+      document.getElementById("profilProjet").innerText = f["Projet"] || "-";
+      document.getElementById("profilSecteur").innerText = f["Secteur(s)"] || "-";
+      document.getElementById("profilStatut").innerText = f["Statut projet"] || "-";
+
+      const emailContact = "contact@coord.fr";
+      const sujetModif = encodeURIComponent("Demande de modification de profil");
+      const corpsModif = encodeURIComponent(`Bonjour,\n\nJe souhaite modifier mes informations sur Coord.\n\nMon nom : ${f["Nom"] || ""}\nCe que je veux modifier : \n\nMerci,\n${f["Nom"] || ""}`);
+      document.getElementById("btnModifier").href = `mailto:${emailContact}?subject=${sujetModif}&body=${corpsModif}`;
+
+      document.getElementById("loading").innerText = "Récupération des missions...";
+      const missions = await airtableSearch("Missions", `{Nom porteur}="${f["Nom"]}"`);
+      const missionsList = document.getElementById("missionsList");
+
+      if (missions.length === 0) {
+        missionsList.innerHTML = '<div class="empty-state">Tu n\'as pas encore créé de mission.</div>';
+      } else {
+        missionsList.innerHTML = missions.map(m => {
+          const mf = m.fields;
+          return `
+            <div class="mission-item">
+              <div class="mission-title">
+                ${mf["Titre du besoin"] || "Mission"}
+                <span class="status-tag ${statusClass(mf["Statut"])}">${mf["Statut"] || ""}</span>
+              </div>
+              <div class="meta">${mf["Besoin"] || ""}</div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      document.getElementById("loading").innerText = "Récupération du cercle...";
+      const cercle = await airtableSearch("Cercle", `{Nom porteur}="${f["Nom"]}"`);
+      const cercleList = document.getElementById("cercleList");
+
+      if (cercle.length === 0) {
+        cercleList.innerHTML = '<div class="empty-state">Ton cercle virtuel est encore vide. Il se remplira après ta première mission.</div>';
+      } else {
+        cercleList.innerHTML = cercle.map(c => {
+          const cf = c.fields;
+          const proposerUrl = `mission-directe.html?porteur_id=${porteurId}&nom_pair=${encodeURIComponent(cf["Nom pair"] || "")}`;
+          return `
+            <div class="cercle-item">
+              <div class="mission-title">${cf["Nom pair"] || ""}</div>
+              <div class="meta">Mission : ${cf["Mission"] || ""} · ${cf["Date entrée"] || ""}</div>
+              <a class="btn btn-secondary" href="${proposerUrl}">Proposer une mission</a>
+            </div>
+          `;
+        }).join("");
+      }
+
+      const cloturees = missions.filter(m => m.fields["Statut"] === "Clôturée");
+      const reportsList = document.getElementById("reportsList");
+
+      if (cloturees.length === 0) {
+        reportsList.innerHTML = '<div class="empty-state">Aucun compte rendu pour le moment.</div>';
+      } else {
+        reportsList.innerHTML = cloturees.map(m => {
+          const mf = m.fields;
+          return `
+            <div class="report-item">
+              <div class="mission-title">${mf["Titre du besoin"] || "Mission"}</div>
+              <div class="meta">Pair : ${mf["Pair assigné"] || "-"}</div>
+              <div class="points-cles">${mf["Points clés"] || ""}</div>
+              ${mf["Note"] ? `<div class="note-badge">${mf["Note"]} / 5</div>` : ""}
+            </div>
+          `;
+        }).join("");
+      }
+
+      document.getElementById("loading").style.display = "none";
+      document.getElementById("content").style.display = "block";
+
+    } catch (err) {
+      document.getElementById("loading").innerText = "Erreur : " + err.message;
+    }
+  }
+</script>
+
+</body>
+</html>
